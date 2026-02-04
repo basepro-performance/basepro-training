@@ -1,6 +1,6 @@
 {
   "name": "BasePró Performance",
-  "short_name": "Analytics Performance",
+  "short_name": "Training",
   "description": "Sistema de Gestão de Treinamento de Alta Performance",
   "start_url": "index.html",
   "display": "standalone",
@@ -16,4 +16,5 @@
   ]
 
 }
+
 
