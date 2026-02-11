@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BasePró Performance</title>
-<link rel="manifest" href="manifest.json">    
-    <meta name="theme-color" content="#0088ff">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;800&display=swap');
@@ -14,9 +11,12 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--basepro-black); color: white; margin-bottom: 80px; }
         .font-brand { font-family: 'Orbitron', sans-serif; }
         .card-gradient { background: var(--card-bg); border: 1px solid #1a2a3a; }
-        .btn-active { background-color: var(--basepro-blue) !important; color: white !important; box-shadow: 0 0 15px rgba(0, 136, 255, 0.4); }
-        .category-header { background: rgba(0, 136, 255, 0.1); color: var(--basepro-blue); font-size: 0.7rem; font-weight: 800; padding: 10px; border-left: 4px solid var(--basepro-blue); text-transform: uppercase; }
-        input { background: transparent !important; border: none !important; color: white !important; width: 100%; outline: none; padding: 5px; }
+        .btn-active { background-color: var(--basepro-blue); color: white; box-shadow: 0 0 15px rgba(0, 136, 255, 0.4); }
+        .tab-btn.active { border-bottom: 3px solid var(--basepro-blue); color: var(--basepro-blue); background: rgba(0, 136, 255, 0.05); }
+        .abc-btn.active { background: var(--basepro-blue); color: white; border-color: var(--basepro-blue); }
+        input { background: transparent !important; border: none !important; color: white !important; width: 100%; outline: none; }
+        .category-header { background: rgba(0, 136, 255, 0.1); color: var(--basepro-blue); font-size: 0.65rem; font-weight: 800; padding: 8px 16px; border-left: 3px solid var(--basepro-blue); text-transform: uppercase; }
+        input:focus { background: rgba(0, 136, 255, 0.15) !important; }
     </style>
 </head>
 <body>
@@ -24,27 +24,51 @@
     <header class="p-6 border-b border-blue-900/30 flex flex-wrap justify-between items-center bg-black sticky top-0 z-50 gap-4">
         <div>
             <h1 class="text-3xl font-brand font-black text-blue-500 italic uppercase">BasePró Performance</h1>
-            <p id="path-display" class="text-[10px] uppercase tracking-widest text-blue-400/60 font-bold italic"></p>
+            <p id="path-display" class="text-[10px] uppercase tracking-widest text-blue-400/60 font-bold italic">PERFORMANCE • MESO 1 • TREINO A</p>
         </div>
         <div class="flex items-center gap-2">
             <select id="history-selector" onchange="loadFromHistory(this.value)" class="text-[10px] p-2 rounded-lg bg-gray-900 border-gray-700 text-blue-400 font-bold outline-none">
                 <option value="current">TREINO ATUAL</option>
             </select>
-            <button class="bg-blue-600 text-white text-[9px] font-bold px-4 py-2 rounded uppercase">Arquivar</button>
+            <button onclick="archiveCycle()" class="bg-blue-600 text-white text-[9px] font-bold px-4 py-2 rounded uppercase">Arquivar Ciclo</button>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4 space-y-6">
-        <div class="grid grid-cols-4 gap-2" id="cycle-controls"></div>
-        <div class="flex bg-gray-900 rounded-lg overflow-hidden border border-blue-900/30" id="variant-controls"></div>
-        <div class="grid grid-cols-6 gap-1" id="t-controls"></div>
-        <div class="flex justify-center gap-3" id="abc-controls"></div>
+    <main class="max-w-4xl mx-auto p-2 sm:p-4 space-y-6">
+        
+        <div class="flex bg-gray-900 rounded-lg overflow-hidden border border-blue-900/30">
+            <button onclick="updateState('variant', 'Performance')" id="var-Performance" class="tab-btn flex-1 py-3 text-[9px] font-bold uppercase">Performance</button>
+            <button onclick="updateState('variant', 'Hipertrofia')" id="var-Hipertrofia" class="tab-btn flex-1 py-3 text-[9px] font-bold uppercase border-x border-blue-900/30">Hipertrofia</button>
+            <button onclick="updateState('variant', 'Emagrecimento')" id="var-Emagrecimento" class="tab-btn flex-1 py-3 text-[9px] font-bold uppercase">Emagrecimento</button>
+            <button onclick="updateState('variant', 'Reabilitacao')" id="var-Reabilitacao" class="tab-btn flex-1 py-3 text-[9px] font-bold uppercase border-l border-blue-900/30">Reabilitação</button>
+        </div>
 
-        <section class="card-gradient rounded-2xl overflow-hidden shadow-2xl mt-4">
+        <div class="grid grid-cols-4 sm:grid-cols-6 gap-1">
+            <script>
+                for(let i=1; i<=12; i++) {
+                    document.write(`<button onclick="updateState('t', ${i})" id="t-${i}" class="t-btn py-3 rounded-xl card-gradient text-gray-500 font-bold text-[10px]">MESO ${i}</button>`);
+                }
+            </script>
+        </div>
+
+        <div class="flex justify-center gap-3">
+            <button onclick="updateState('abc', 'A')" id="abc-A" class="abc-btn px-6 py-2 rounded-full border border-blue-900/50 text-[10px] font-bold uppercase">Treino A</button>
+            <button onclick="updateState('abc', 'B')" id="abc-B" class="abc-btn px-6 py-2 rounded-full border border-blue-900/50 text-[10px] font-bold uppercase">Treino B</button>
+            <button onclick="updateState('abc', 'C')" id="abc-C" class="abc-btn px-6 py-2 rounded-full border border-blue-900/50 text-[10px] font-bold uppercase">Treino C</button>
+        </div>
+
+        <div class="flex justify-end px-1">
+            <button onclick="deleteThisWorkout()" class="text-[9px] bg-red-600/10 text-red-500 border border-red-500/20 px-4 py-2 rounded hover:bg-red-600 hover:text-white transition-all font-bold uppercase flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                Zerar dados salvos deste treino
+            </button>
+        </div>
+
+        <section class="card-gradient rounded-2xl overflow-hidden shadow-2xl">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="text-[9px] uppercase text-blue-400/50 border-b border-blue-900/30">
-                        <th class="p-4">Exercício</th>
+                        <th class="p-4">Exercício (Editar)</th>
                         <th class="p-4 w-16 text-center">Séries</th>
                         <th class="p-4 w-24 text-center">Carga</th>
                         <th class="p-4 w-28 text-center">Rep/Obs</th>
@@ -56,25 +80,28 @@
 
         <section class="card-gradient p-4 rounded-xl border-l-4 border-l-blue-500">
             <h3 class="text-blue-400 font-brand text-[10px] mb-2 uppercase italic font-bold">Prescrição da Sessão</h3>
-            <textarea id="prescricao-area" oninput="updatePresc(this.value)" class="w-full h-24 bg-transparent text-xs outline-none" placeholder="Observações específicas..."></textarea>
+            <textarea id="prescricao-area" oninput="updatePresc(this.value)" class="w-full h-24 bg-transparent text-xs outline-none" placeholder="Observações específicas para esta combinação..."></textarea>
         </section>
 
-        <button onclick="saveData()" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl uppercase text-sm shadow-lg transition-all hover:bg-blue-500">GRAVAR NO BANCO DE DADOS</button>
+        <button onclick="saveData()" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl uppercase text-sm hover:bg-blue-500 shadow-lg transition-all">GRAVAR NO BANCO DE DADOS</button>
     </main>
 
     <script>
-        let state = { cycle: 1, variant: 'Performance', t: 1, abc: 'A' };
+        let state = { variant: 'Performance', t: 1, abc: 'A' };
         let appData = {}; 
+        let history = [];
 
         function getInitialWorkout() {
             return {
                 "Mobilidade": [
-                    {name:"Alongamento", sets:"3", weight:"-", rest:"30s"},
+                    {name:"Mobilidade 1", sets:"3", weight:"-", rest:"30s"},
                     {name:"Mobilidade 2", sets:"3", weight:"-", rest:"30s"},
                     {name:"Mobilidade 3", sets:"3", weight:"-", rest:"30s"}
                 ],
                 "Core": [
-                    {name:"Plancha", sets:"3", weight:"BW", rest:"45s"}
+                    {name:"Core 1", sets:"3", weight:"BW", rest:"45s"},
+                    {name:"Core 2", sets:"3", weight:"BW", rest:"45s"},
+                    {name:"Core 3", sets:"3", weight:"BW", rest:"45s"}
                 ],
                 "Treino": Array(8).fill(null).map((_, i) => ({name:`Exercício ${i+1}`, sets:"4", weight:"0kg", rest:"12"})),
                 "presc": ""
@@ -83,23 +110,26 @@
 
         function initData() {
             const variants = ['Performance', 'Hipertrofia', 'Emagrecimento', 'Reabilitacao'];
-            for(let c=1; c<=4; c++) {
-                appData[c] = {};
-                variants.forEach(v => {
-                    appData[c][v] = {};
-                    for(let t=1; t<=6; t++) {
-                        appData[c][v][t] = { "A": getInitialWorkout(), "B": getInitialWorkout(), "C": getInitialWorkout() };
-                    }
-                });
-            }
+            appData = {}; // Estrutura sem ciclo S
+            variants.forEach(v => {
+                appData[v] = {};
+                for(let t=1; t<=12; t++) {
+                    appData[v][t] = { "A": getInitialWorkout(), "B": getInitialWorkout(), "C": getInitialWorkout() };
+                }
+            });
+        }
+
+        function deleteThisWorkout() {
+            if(!confirm("Isso apagará permanentemente o conteúdo salvo deste treino. Deseja continuar?")) return;
+            appData[state.variant][state.t][state.abc] = getInitialWorkout();
+            saveData(false);
+            render();
         }
 
         function render() {
-            const current = appData[state.cycle][state.variant][state.t][state.abc];
-            document.getElementById('path-display').innerText = `S${state.cycle} • ${state.variant.toUpperCase()} • T${state.t} • TREINO ${state.abc}`;
+            const current = appData[state.variant][state.t][state.abc];
+            document.getElementById('path-display').innerText = `${state.variant.toUpperCase()} • MESO ${state.t} • TREINO ${state.abc}`;
             document.getElementById('prescricao-area').value = current.presc || "";
-
-            renderControls();
 
             const list = document.getElementById('exercise-list');
             list.innerHTML = '';
@@ -120,52 +150,60 @@
                     list.appendChild(r);
                 });
             });
+            updateUI();
         }
 
-        function renderControls() {
-            let htmlCycle = '';
-            for(let i=1; i<=4; i++) {
-                htmlCycle += `<button onclick="updateState('cycle', ${i})" class="py-3 rounded-lg border border-blue-900/30 text-xs font-bold transition-all ${state.cycle==i?'btn-active':'text-gray-500'}">S${i}</button>`;
+        function updateUI() {
+            ['Performance', 'Hipertrofia', 'Emagrecimento', 'Reabilitacao'].forEach(v => document.getElementById(`var-${v}`).className = (v == state.variant) ? "tab-btn flex-1 py-3 text-[9px] font-bold uppercase tab-btn active" : "tab-btn flex-1 py-3 text-[9px] font-bold uppercase text-gray-500");
+            for(let i=1; i<=12; i++) {
+                const btn = document.getElementById(`t-${i}`);
+                if(btn) btn.className = (i == state.t) ? "t-btn py-3 rounded-xl card-gradient border-blue-500 text-blue-500 font-bold text-[10px]" : "t-btn py-3 rounded-xl card-gradient border-gray-800 text-gray-500 font-bold text-[10px]";
             }
-            document.getElementById('cycle-controls').innerHTML = htmlCycle;
-
-            let htmlVar = '';
-            ['Performance', 'Hipertrofia', 'Emagrecimento', 'Reabilitacao'].forEach(v => {
-                htmlVar += `<button onclick="updateState('variant', '${v}')" class="flex-1 py-3 text-[9px] font-bold uppercase transition-all ${state.variant==v?'btn-active':'text-gray-500'}">${v}</button>`;
-            });
-            document.getElementById('variant-controls').innerHTML = htmlVar;
-
-            let htmlT = '';
-            for(let i=1; i<=6; i++) {
-                htmlT += `<button onclick="updateState('t', ${i})" class="py-3 rounded-xl card-gradient font-bold text-[10px] border transition-all ${state.t==i?'btn-active border-blue-500':'border-blue-900/30 text-gray-500'}">T${i}</button>`;
-            }
-            document.getElementById('t-controls').innerHTML = htmlT;
-
-            let htmlABC = '';
-            ['A', 'B', 'C'].forEach(abc => {
-                htmlABC += `<button onclick="updateState('abc', '${abc}')" class="px-6 py-2 rounded-full border text-[10px] font-bold uppercase transition-all ${state.abc==abc?'btn-active border-blue-500':'border-blue-900/50 text-gray-500'}">Treino ${abc}</button>`;
-            });
-            document.getElementById('abc-controls').innerHTML = htmlABC;
+            ['A', 'B', 'C'].forEach(abc => document.getElementById(`abc-${abc}`).className = (abc == state.abc) ? "abc-btn px-6 py-2 rounded-full border abc-btn active text-[10px] font-bold uppercase" : "abc-btn px-6 py-2 rounded-full border border-blue-900/50 text-[10px] font-bold text-gray-500 uppercase");
         }
 
         function updateState(key, val) { state[key] = val; render(); }
-        function updateVal(seg, i, field, val) { appData[state.cycle][state.variant][state.t][state.abc][seg][i][field] = val; }
-        function updatePresc(val) { appData[state.cycle][state.variant][state.t][state.abc].presc = val; }
-        
-        function saveData() { 
-            localStorage.setItem('basepro_pwa_v1', JSON.stringify({appData})); 
-            alert("Dados gravados no banco local!"); 
+        function updateVal(seg, i, field, val) { appData[state.variant][state.t][state.abc][seg][i][field] = val; }
+        function updatePresc(val) { appData[state.variant][state.t][state.abc].presc = val; }
+
+        function saveData(notify = true) {
+            localStorage.setItem('basepro_v33_db', JSON.stringify({appData, history}));
+            if(notify) alert("Dados Gravados!");
+        }
+
+        function archiveCycle() {
+            const nome = prompt("Nome do Ciclo Histórico:");
+            if(!nome) return;
+            history.unshift({id: Date.now(), label: nome, data: JSON.parse(JSON.stringify(appData))});
+            saveData();
+            updateHistoryDropdown();
+        }
+
+        function updateHistoryDropdown() {
+            const sel = document.getElementById('history-selector');
+            sel.innerHTML = '<option value="current">TREINO ATUAL</option>';
+            history.forEach(h => {
+                const opt = document.createElement('option'); opt.value = h.id; opt.innerText = h.label;
+                sel.appendChild(opt);
+            });
+        }
+
+        function loadFromHistory(val) {
+            const saved = JSON.parse(localStorage.getItem('basepro_v33_db'));
+            appData = (val === 'current') ? saved.appData : history.find(h => h.id == val).data;
+            render();
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('basepro_pwa_v1');
+            const saved = localStorage.getItem('basepro_v33_db');
             if(saved) {
                 const p = JSON.parse(saved);
                 appData = p.appData;
+                history = p.history || [];
             } else { initData(); }
+            updateHistoryDropdown();
             render();
         };
     </script>
 </body>
-
 </html>
